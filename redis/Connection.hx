@@ -48,8 +48,13 @@ class Connection {
 	}
 
 	var sock : sys.net.Socket;
+	public var host(default,null) : String;
+	public var port(default,null) : Int;
 	
 	public function new( host : String, port = 6379 ){
+		this.host = host;
+		this.port = port;
+
 		sock = new sys.net.Socket();
 		sock.setTimeout(TIMEOUT);
 		sock.connect(new sys.net.Host(host),port);
@@ -263,6 +268,10 @@ class Connection {
 		return multistr(command("HKEYS",[key]));
 	}
 
+	public function hvals( key : String ){
+		return multistr(command("HVALS",[key]));
+	}
+
 	public function hset( key : String, hk : String, hv : String ){
 		return int(command("HSET",[key,hk,hv]));
 	}
@@ -288,6 +297,20 @@ class Connection {
 		return isOk(command("HMSET",Lambda.array(l)));
 	}
 
+	public function hmget( key : String, fields: Array<String> ){
+		var a = [key];
+		for( f in fields )
+			a.push(f);
+		var r = multistr(command("HMGET",a));
+		if( r.length != fields.length )
+			throw "";
+		var h = new Map();
+		var i = 0;
+		for( f in fields )
+			h.set( f, r[i++] );
+		return h;
+	}
+
 	public function hlen( key : String ){
 		return int(command("HLEN",[key]));
 	}
@@ -296,6 +319,71 @@ class Connection {
 		return int(command("HEXISTS",[key,field])) == 1;
 	}
 
+	public function hincrby( key : String, field : String, increment : Int ){
+		return int(command("HINCRBY",[key,field,Std.string(increment)]));
+	}
+
+	public function hincrbyfloat( key : String, field : String, increment : Float ){
+		return int(command("HINCRBYFLOAT",[key,field,Std.string(increment)]));
+	}
+
+	//
+
+	public function sadd( key : String, values : Array<String> ){
+		var a = [key];
+		for( f in values )
+			a.push(f);
+		return int(command("SADD",a));
+	}
+
+	public function smembers( key : String ){
+		return multistr(command("SMEMBERS",[key]));
+	}
+
+	public function scard( key : String ){
+		return int(command("SCARD",[key]));
+	}
+
+	public function spop( key : String ){
+		return str(command("SPOP",[key]));
+	}
+
+	public function srandmember( key : String ){
+		return str(command("SRANDMEMBER",[key]));
+	}
+
+	public function srandmembers( key : String, count : Int ){
+		return multistr(command("SRANDMEMBER",[key,Std.string(count)]));
+	}
+
+	public function srem( key : String, members: Array<String> ){
+		var a = [key];
+		for( m in members )
+			a.push( m );
+		return int(command("SREM",a));
+	}
+	
+	public function sismember( key : String, member : String ){
+		return int(command("SISMEMBER",[key,member])) == 1;
+	}
+
+	/*
+	// TODO
+	public function smove(){
+	}
+	public function sdiff(){
+	}
+	public function sdiffstore(){
+	}
+	public function sinter(){
+	}	
+	public function sinterstore(){
+	}
+	public function sunion(){
+	}
+	public function sunionstore(){
+	}
+	*/
 
 	// 
 

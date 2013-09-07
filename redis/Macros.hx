@@ -28,7 +28,7 @@ class Macros {
 			case FVar(t,_):
 				switch( t ){
 				case TPath(p):
-					if( p.pack.length != 1 || p.pack[0] != "redis" || !Lambda.has(["KList","Queue","KString","KHash"],p.name) )
+					if( p.pack.length != 1 || p.pack[0] != "redis" || !Lambda.has(["KList","Queue","KString","KHash","KSet"],p.name) )
 						Context.error("@:skip missing ?",f.pos);
 					
 					names.push(cname+"#%_"+f.name);

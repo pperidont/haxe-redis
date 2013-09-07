@@ -14,6 +14,10 @@ class KHash extends Key {
 		return Key.CNX.hset(key,field,value);
 	}
 
+	public function increment( field : String, ?value = 1 ){
+		return Key.CNX.hincrby(key,field,value);
+	}
+
 	public function get( field : String ){
 		return Key.CNX.hget(key,field);
 	}
